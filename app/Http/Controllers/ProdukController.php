@@ -77,7 +77,9 @@ class ProdukController extends Controller
     }
 
     public function getByIdUser ($id) {
-      $produk = Produk::where('idUser', '=', $id)->get();
+      $produk = Produk::join('users', 'tb_produk.idUser', '=', 'users.id')
+                        ->where('users.id', '=', $id)
+                        ->get();
       return response()->json($produk);
     }
     public function getAll () {

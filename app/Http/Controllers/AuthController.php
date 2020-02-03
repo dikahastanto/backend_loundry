@@ -76,5 +76,19 @@ class AuthController extends Controller
         return $response;
     }
 
+    public function search (Request $request) {
+        $keyword = $request->keyword;
+        $user = User::where([
+            ['namaLengkap', 'LIKE', '%' . $keyword . '%'],
+            ['level', '=', 1]
+        ])->get();
+        return $user;
+    }
+
+    public function getData ($id) {
+        $user = User::where('id', '=',$id)->first();
+        return $user;
+    }
+
     //
 }
