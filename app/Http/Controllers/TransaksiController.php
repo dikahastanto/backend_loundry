@@ -91,7 +91,7 @@ class TransaksiController extends Controller
                                 'tb_produk.isi'
                                 )
                             ->where('tb_transaksi.idPelanggan', '=', $id)
-                            ->orderBy('tb_transaksi.created_at', 'desc')
+                            ->orderBy('tb_transaksi.status', 'asc')
                             ->get();
       return response()->json($produk);
     }

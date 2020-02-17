@@ -19,6 +19,8 @@ $router->post('/register', 'AuthController@register');
 $router->post('/login', 'AuthController@login');
 $router->post('/search', 'AuthController@search');
 $router->get('/getprofile/{id}', 'AuthController@getData');
+$router->post('/changepassword/{id}', 'AuthController@changePassword');
+$router->post('/updateprofile/{id}', 'AuthController@updateProfilePelanggan');
 
 // produk route
 $router->post('/produk/insert', 'ProdukController@insert');
@@ -31,3 +33,7 @@ $router->get('/transaksi/pelanggan/{id}', 'TransaksiController@getPelanggan');
 $router->get('/transaksi/owner/{id}', 'TransaksiController@getTransaksiByOwner');
 $router->post('/transaksi/confirm/{id}', 'TransaksiController@confirm');
 $router->post('/transaksi/selesai/{id}', 'TransaksiController@selesai');
+
+// rating route
+$router->get('/rating/getstatus/{idOwner}/{idPelanggan}', 'RatingController@getStatusRating');
+$router->post('/rating/giverating', 'RatingController@giveRating');

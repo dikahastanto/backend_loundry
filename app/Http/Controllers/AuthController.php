@@ -19,25 +19,35 @@ class AuthController extends Controller
     }
 
     public function register (Request $request) {
-        $pas = Hash::make($request->password);
-        $input = [
-            'email' => $request->email,
-            'namaLengkap' => $request->namaLengkap,
-            'alamat' => $request->alamat,
-            'password' => Hash::make($request->password)
-        ];
-        $reqister = User::create($input);
-        $response = null;
-        if ($reqister) {
+
+        $response;
+        $email = $request->email;
+        if ($this->emailExists($email, 0, 0)) {
             $response = [
-                'sukses' => true,
-                'msg' => 'Berhasil Registrasi',
+                'sukses' => false,
+                'msg' => 'E-Mail Telah Terdaftar',
             ];
         } else {
-            $response = [
-                'sukses' => true,
-                'msg' => 'Berhasil Registrasi',
+            $pas = Hash::make($request->password);
+            $input = [
+                'email' => $email,
+                'namaLengkap' => $request->namaLengkap,
+                'alamat' => $request->alamat,
+                'noTelp' => $request->noTelp,
+                'password' => Hash::make($request->password)
             ];
+            $reqister = User::create($input);
+            if ($reqister) {
+                $response = [
+                    'sukses' => true,
+                    'msg' => 'Berhasil Registrasi',
+                ];
+            } else {
+                $response = [
+                    'sukses' => true,
+                    'msg' => 'Berhasil Registrasi',
+                ];
+            }
         }
         return $response;
     }
@@ -88,6 +98,88 @@ class AuthController extends Controller
     public function getData ($id) {
         $user = User::where('id', '=',$id)->first();
         return $user;
+    }
+
+    public function changePassword (Request $request, $id) {
+        $oldPassword = $request->oldPassword;
+        $newPassword = $request->newPassword;
+        
+        $response;
+        $user = User::where('id', $id)->first();
+        if (Hash::check($oldPassword, $user->password)) {
+            if ($oldPassword == $newPassword) {
+                $response = [
+                    'sukses' => true,
+                    'msg' => 'Tidak Ada Perubahan Data'
+                ];
+            } else {
+                $update = User::where('id', $id)
+                                ->update(['password' => Hash::make($newPassword)]);
+                if ($update) {
+                    $response = [
+                        'sukses' => true,
+                        'msg' => 'Password Telah Dirubah'
+                    ];
+                } else {
+                    $response = [
+                        'sukses' => false,
+                        'msg' => 'Terjadi Kesalahan'
+                    ];
+                }
+            }
+        } else {
+            $response = [
+                'sukses' => false,
+                'msg' => 'Password Lama Salah'
+            ];
+        }
+        return $response;
+    }
+
+    public function updateProfilePelanggan (Request $request, $id) {
+        $response;
+        if ($this->emailExists($request->email, $id, 1)) {
+            $response = [
+                'sukses' => false,
+                'msg' => 'E-Mail Sudah Digunakan'
+            ];
+        } else {
+            $update = User::where('id', $id)->update($request->all());
+
+            if ($update) {
+                $response = [
+                    'sukses' => true,
+                    'msg' => 'Berhasil Mengubah Data'
+                ];
+            } else {
+                $response = [
+                    'sukses' => false,
+                    'msg' => 'Gagal Merubah Data'
+                ];
+            }
+        }
+        return $response;
+
+    }
+
+    public function emailExists ($email, $id, $type) {
+        $query;
+        if ($type == 1) {
+            $query = [
+                ['email', '=', $email],
+                ['id', '<>', $id]
+            ];
+        } else {
+            $query = [
+                ['email', '=', $email]
+            ];
+        }
+        $cek = User::where($query)->first();
+        if ($cek) {
+            return true;
+        } else {
+            return false;
+        }
     }
 
     //
